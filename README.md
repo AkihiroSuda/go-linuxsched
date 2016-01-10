@@ -16,7 +16,7 @@ type SchedAttr struct {
 	Period   time.Duration
 }
 
-func (a *SchedAttr) SetTo(pid int, flags uint) error {..}
+func SetAttr(pid int, attr SchedAttr) error {..}
 
-func (a *SchedAttr) GetFrom(pid int, flags uint) error {..}
+func GetAttr(pid int) (SchedAttr, error) {..}
 ```

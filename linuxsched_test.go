@@ -1,30 +1,36 @@
 package linuxsched
 
 import (
+	"syscall"
 	"testing"
 )
 
-func TestGetSchedAttrFromCurrentProcess(t *testing.T) {
-	attr := SchedAttr{}
-	err := attr.GetFrom(0, 0)
+func skipOnENOSYS(t *testing.T, err error) {
+	if err == syscall.ENOSYS {
+		t.Skip("Skipping due to ENOSYS")
+	}
+}
+
+func TestGetAttrFromCurrentProcess(t *testing.T) {
+	attr, err := GetAttr(0)
+	skipOnENOSYS(t, err)
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Logf("%#v", attr)
 }
 
-func TestGetSchedAttrFromBadProcess(t *testing.T) {
-	attr := SchedAttr{}
-	err := attr.GetFrom(-1, 0)
-	t.Logf("error (perhaps expected): %s", err)
-	if err == nil {
-		t.Fatal("error is expected")
+func TestGetAttrFromBadProcess(t *testing.T) {
+	attr, err := GetAttr(-1)
+	skipOnENOSYS(t, err)
+	if err != syscall.EINVAL {
+		t.Fatalf("EINVAL expected: err=%s, attr=%#v", err, attr)
 	}
 }
 
-func TestSetSchedAttrToCurrentProcess(t *testing.T) {
-	attr := SchedAttr{}
-	err := attr.GetFrom(0, 0)
+func TestSetAttrToCurrentProcess(t *testing.T) {
+	attr, err := GetAttr(0)
+	skipOnENOSYS(t, err)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -32,16 +38,13 @@ func TestSetSchedAttrToCurrentProcess(t *testing.T) {
 	if !(attr.Policy == Normal && attr.Nice == 0) {
 		t.Skip("Skipping due to unexpected environment")
 	}
-	attr = SchedAttr{
-		// range  -20 (high priority) to +19 (low priority)
-		Nice: 1,
-	}
-	err = attr.SetTo(0, 0)
+	// range  -20 (high priority) to +19 (low priority)
+	attr.Nice = 1
+	err = SetAttr(0, attr)
 	if err != nil {
 		t.Fatal(err)
 	}
-	attr = SchedAttr{}
-	err = attr.GetFrom(0, 0)
+	attr, err = GetAttr(0)
 	if err != nil {
 		t.Fatal(err)
 	}
