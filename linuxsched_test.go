@@ -1,8 +1,10 @@
 package linuxsched
 
 import (
+	"encoding/json"
 	"syscall"
 	"testing"
+	"time"
 )
 
 func skipOnENOSYS(t *testing.T, err error) {
@@ -51,5 +53,28 @@ func TestSetAttrToCurrentProcess(t *testing.T) {
 	t.Logf("new attr: %#v", attr)
 	if !(attr.Policy == Normal && attr.Nice == 1) {
 		t.Fatalf("unexpected: %#v", attr)
+	}
+}
+
+func TestMarshalJSON(t *testing.T) {
+	attr1 := SchedAttr{
+		Policy:   Deadline,
+		Runtime:  42 * time.Microsecond,
+		Deadline: 1000 * time.Microsecond,
+		Period:   1000 * time.Microsecond,
+	}
+	m, err := json.Marshal(attr1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("attr1=%#v, m=%s", attr1, string(m))
+	attr2 := SchedAttr{}
+	err = json.Unmarshal([]byte(string(m)), &attr2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("attr2=%#v", attr2)
+	if attr1 != attr2 {
+		t.Fatalf("Mismatch: %#v vs %#v", attr1, attr2)
 	}
 }
