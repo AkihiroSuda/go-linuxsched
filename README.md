@@ -1,5 +1,5 @@
-go-linuxsched
-==================
+# go-linuxsched
+
 [![Build Status](https://travis-ci.org/AkihiroSuda/go-linuxsched.svg)](https://travis-ci.org/AkihiroSuda/go-linuxsched)
 [![GoDoc](https://godoc.org/github.com/AkihiroSuda/go-linuxsched?status.svg)](https://godoc.org/github.com/AkihiroSuda/go-linuxsched)
 
@@ -20,3 +20,7 @@ func SetAttr(pid int, attr SchedAttr) error {..}
 
 func GetAttr(pid int) (SchedAttr, error) {..}
 ```
+
+## Projects using go-linuxsched
+
+ * [Earthquake: a programmable fuzzy scheduler for testing distributed systems](https://github.com/osrg/earthquake)
